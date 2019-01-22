@@ -11,7 +11,6 @@ import cchcc.android.requestpermission.RequestPermission
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 class MainActivity : AppCompatActivity()
     , ActivityResult by ActivityResult.create()

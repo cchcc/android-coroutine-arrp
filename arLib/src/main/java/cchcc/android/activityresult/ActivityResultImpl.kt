@@ -15,17 +15,27 @@ class ActivityResultImpl : ActivityResult {
     }
 
     override suspend fun Activity.startActivityForResultAwait(intent: Intent, options: Bundle?)
+            : Pair<Int, Intent?> = activityResultAwait {
+        ActivityCompat.startActivityForResult(this, intent, it, options)
+    }
+
+    override suspend fun Activity.activityResultAwait(startActivity:(Int) -> Unit)
             : Pair<Int, Intent?> = suspendCoroutine { continuation ->
-        val requestCode = generateRequestCode(intent.hashCode())
+        val requestCode = generateRequestCode(continuation.hashCode())
         arContinuations.put(requestCode, continuation)
-        ActivityCompat.startActivityForResult(this, intent, requestCode, options)
+        startActivity(requestCode)
     }
 
     override suspend fun Fragment.startActivityForResultAwait(intent: Intent, options: Bundle?)
+            : Pair<Int, Intent?> = activityResultAwait {
+        startActivityForResult(intent, it, options)
+    }
+
+    override suspend fun Fragment.activityResultAwait(startActivity:(Int) -> Unit)
             : Pair<Int, Intent?> = suspendCoroutine { continuation ->
-        val requestCode = generateRequestCode(intent.hashCode())
+        val requestCode = generateRequestCode(continuation.hashCode())
         arContinuations.put(requestCode, continuation)
-        startActivityForResult(intent, requestCode, options)
+        startActivity(requestCode)
     }
 
     // requestCode must be <= 0xffff

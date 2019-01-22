@@ -12,17 +12,18 @@ interface ActivityResult {
     val arContinuations: SparseArray<Continuation<Pair<Int, Intent?>>>
 
     /**
-     *  onActivityResult 에서 호출할것
+     *  onActivityResult()
      */
     fun activityResult(requestCode: Int, resultCode: Int, data: Intent?) = arContinuations[requestCode]?.let {
         arContinuations.remove(requestCode)
         it.resume(resultCode to data)
     }
 
-//    suspend fun startActivityForResultAwait(intent: Intent, options: Bundle? = null): Pair<Int, Intent?>
     suspend fun Activity.startActivityForResultAwait(intent: Intent, options: Bundle? = null): Pair<Int, Intent?>
+    suspend fun Activity.activityResultAwait(startActivity:(Int) -> Unit): Pair<Int, Intent?>
 
     suspend fun Fragment.startActivityForResultAwait(intent: Intent, options: Bundle? = null): Pair<Int, Intent?>
+    suspend fun Fragment.activityResultAwait(startActivity:(Int) -> Unit): Pair<Int, Intent?>
 
     companion object {
         fun create() = ActivityResultImpl()

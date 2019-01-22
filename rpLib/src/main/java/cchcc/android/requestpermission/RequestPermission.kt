@@ -11,7 +11,7 @@ interface RequestPermission {
     val rpContinuation: SparseArray<Continuation<Boolean>>
 
     /**
-     *  Activity 와 Fragment 의 멤버 함수 onRequestPermissionsResult 에서 호출 할것
+     *  onRequestPermissionsResult()
      */
     fun permissionResult(requestCode: Int, grantResults: IntArray) = rpContinuation[requestCode]?.let { continuation ->
         rpContinuation.remove(requestCode)
