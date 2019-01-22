@@ -19,7 +19,7 @@ class ActivityResultImpl : ActivityResult {
         ActivityCompat.startActivityForResult(this, intent, it, options)
     }
 
-    override suspend fun Activity.activityResultAwait(startActivity:(Int) -> Unit)
+    override suspend fun Activity.activityResultAwait(startActivity: (Int) -> Unit)
             : Pair<Int, Intent?> = suspendCoroutine { continuation ->
         val requestCode = generateRequestCode(continuation.hashCode())
         arContinuations.put(requestCode, continuation)
@@ -31,7 +31,7 @@ class ActivityResultImpl : ActivityResult {
         startActivityForResult(intent, it, options)
     }
 
-    override suspend fun Fragment.activityResultAwait(startActivity:(Int) -> Unit)
+    override suspend fun Fragment.activityResultAwait(startActivity: (Int) -> Unit)
             : Pair<Int, Intent?> = suspendCoroutine { continuation ->
         val requestCode = generateRequestCode(continuation.hashCode())
         arContinuations.put(requestCode, continuation)
@@ -61,8 +61,9 @@ class ActivityResultImpl : ActivityResult {
         private val excludeRequestCode by lazy(LazyThreadSafetyMode.NONE) { mutableSetOf<Int>() }
 
         /**
-         *  Add request code that need to be ignored from `generateRequestCode()`.
-         *  So, `generateRequestCode()` will not return added code.
+         *  Add requestCode that need to be prevent to generate requestCode internally.
+         *
+         *  @param requestCode
          */
         fun addExcludeRequestCode(requestCode: Int) = excludeRequestCode.add(requestCode)
     }

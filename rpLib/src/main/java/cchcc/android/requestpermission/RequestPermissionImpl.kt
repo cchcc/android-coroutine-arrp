@@ -40,7 +40,6 @@ class RequestPermissionImpl : RequestPermission {
         }
     }
 
-
     override suspend fun Fragment.requestPermissionAwait(vararg permissions: String)
             : Boolean = suspendCoroutine { continuation ->
         val context = this@requestPermissionAwait.requireContext()
@@ -77,11 +76,10 @@ class RequestPermissionImpl : RequestPermission {
     }
 
     companion object {
-        private val excludeRequestCode = mutableSetOf<Int>()
+        private val excludeRequestCode by lazy(LazyThreadSafetyMode.NONE) { mutableSetOf<Int>() }
 
         /**
-         *  Add request code that need to be ignored from `generateRequestCode()`.
-         *  So, `generateRequestCode()` will not return added code.
+         *  Add requestCode that need to be prevent to generate requestCode internally.
          */
         fun addExcludeRequestCode(requestCode: Int) = excludeRequestCode.add(requestCode)
     }
