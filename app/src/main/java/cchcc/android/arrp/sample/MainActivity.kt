@@ -1,4 +1,4 @@
-package cchcc.android.arrp
+package cchcc.android.arrp.sample
 
 import android.app.Activity
 import android.content.Intent
@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.provider.ContactsContract
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import cchcc.android.arrp.ActivityResult
+import cchcc.android.arrp.RequestPermission
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

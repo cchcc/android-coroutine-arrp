@@ -1,4 +1,4 @@
-package cchcc.android.arrp
+package cchcc.android.arrp.sample
 
 import org.junit.Test
 
