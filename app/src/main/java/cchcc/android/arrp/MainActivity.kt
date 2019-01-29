@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.provider.ContactsContract
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import cchcc.android.activityresult.ActivityResult
-import cchcc.android.requestpermission.RequestPermission
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

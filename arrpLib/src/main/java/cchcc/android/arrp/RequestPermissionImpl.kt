@@ -1,4 +1,4 @@
-package cchcc.android.requestpermission
+package cchcc.android.arrp
 
 import android.app.Activity
 import android.content.pm.PackageManager
@@ -66,21 +66,12 @@ class RequestPermissionImpl : RequestPermission {
             if (rpContinuation[code] != null)
                 continue
 
-            if (seed in excludeRequestCode)
+            if (seed in RequestPermission.excludeRequestCode)
                 continue
 
             break
         }
 
         return code
-    }
-
-    companion object {
-        private val excludeRequestCode by lazy(LazyThreadSafetyMode.NONE) { mutableSetOf<Int>() }
-
-        /**
-         *  Add requestCode that need to be prevent to generate requestCode internally.
-         */
-        fun addExcludeRequestCode(requestCode: Int) = excludeRequestCode.add(requestCode)
     }
 }

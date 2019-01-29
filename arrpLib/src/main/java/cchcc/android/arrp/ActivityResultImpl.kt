@@ -1,4 +1,4 @@
-package cchcc.android.activityresult
+package cchcc.android.arrp
 
 import android.app.Activity
 import android.content.Intent
@@ -48,23 +48,12 @@ class ActivityResultImpl : ActivityResult {
             if (arContinuations[code] != null)
                 continue
 
-            if (seed in excludeRequestCode)
+            if (seed in ActivityResult.excludeRequestCode)
                 continue
 
             break
         }
 
         return code
-    }
-
-    companion object {
-        private val excludeRequestCode by lazy(LazyThreadSafetyMode.NONE) { mutableSetOf<Int>() }
-
-        /**
-         *  Add requestCode that need to be prevent to generate requestCode internally.
-         *
-         *  @param requestCode
-         */
-        fun addExcludeRequestCode(requestCode: Int) = excludeRequestCode.add(requestCode)
     }
 }

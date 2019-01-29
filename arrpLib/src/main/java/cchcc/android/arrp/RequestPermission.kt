@@ -1,4 +1,4 @@
-package cchcc.android.requestpermission
+package cchcc.android.arrp
 
 import android.app.Activity
 import android.content.pm.PackageManager
@@ -20,10 +20,11 @@ interface RequestPermission {
      *  }
      *  ```
      */
-    fun permissionResult(requestCode: Int, grantResults: IntArray) = rpContinuation[requestCode]?.let { continuation ->
-        rpContinuation.remove(requestCode)
-        continuation.resume(grantResults.all { it == PackageManager.PERMISSION_GRANTED })
-    }
+    fun permissionResult(requestCode: Int, grantResults: IntArray): Unit =
+        rpContinuation[requestCode]?.let { continuation ->
+            rpContinuation.remove(requestCode)
+            continuation.resume(grantResults.all { it == PackageManager.PERMISSION_GRANTED })
+        } ?: Unit
 
     /**
      *  @param permissions array of [android.Manifest.permission]
@@ -32,8 +33,9 @@ interface RequestPermission {
     fun Activity.hasPermission(vararg permissions: String): Boolean
 
     /**
+     *  Convenient version of [Activity.requestPermissions] on coroutine.
      *  Await till finish to process of `requestPermission`, and then return whether it is granted.
-     *  First, check if permission is all granted. If not, request permission to user by system popup.
+     *  This method checks if permission is all granted at first. If not, request permission to user by system popup.
      *
      *  If return is not working, check if [RequestPermission.permissionResult] is placed appropriate.
      *
@@ -49,8 +51,9 @@ interface RequestPermission {
     fun Fragment.hasPermission(vararg permissions: String): Boolean
 
     /**
+     *  Convenient version of [Fragment.requestPermissions] on coroutine.
      *  Await till finish to process of `requestPermission`, and then return whether it is granted.
-     *  First, check if permission is all granted. If not, request permission to user by system popup.
+     *  This method checks if permission is all granted at first. If not, request permission to user by system popup.
      *
      *  If return is not working, check if [RequestPermission.permissionResult] is placed appropriate.
      *
@@ -67,7 +70,17 @@ interface RequestPermission {
          *  class MyActivity : AppCompatActivity(), RequestPermission by RequestPermission.create()
          *  ```
          */
-        fun create() = RequestPermissionImpl()
+        fun create(): RequestPermission = RequestPermissionImpl()
+
+        /**
+         *  Add requestCode that need to be prevent to generate requestCode internally.
+         *
+         *  @param requestCode
+         *  @return whether adding is success
+         */
+        fun addExcludeRequestCode(requestCode: Int): Boolean = excludeRequestCode.add(requestCode)
+
+        internal val excludeRequestCode by lazy(LazyThreadSafetyMode.NONE) { mutableSetOf<Int>() }
     }
 }
 
