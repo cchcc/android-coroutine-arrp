@@ -12,19 +12,11 @@ import kotlin.coroutines.suspendCoroutine
 
 class RequestPermissionImpl : RequestPermission {
     override val rpContinuation by lazy(LazyThreadSafetyMode.NONE) {
-        SparseArray<Continuation<Boolean>>()
-    }
-
-    override fun Activity.hasPermission(vararg permissions: String): Boolean = permissions.all {
-        ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
-    }
-
-    override fun Fragment.hasPermission(vararg permissions: String): Boolean = permissions.all {
-        ContextCompat.checkSelfPermission(requireContext(), it) == PackageManager.PERMISSION_GRANTED
+        SparseArray<Continuation<RequestPermission.Result>>()
     }
 
     override suspend fun Activity.requestPermissionAwait(vararg permissions: String)
-            : Boolean = suspendCoroutine { continuation ->
+            : RequestPermission.Result = suspendCoroutine { continuation ->
         val activity = this@requestPermissionAwait
 
         val notGranted = permissions.filter {
@@ -32,7 +24,7 @@ class RequestPermissionImpl : RequestPermission {
         }
 
         if (notGranted.isEmpty()) {
-            continuation.resume(true)
+            continuation.resume(RequestPermission.Result.Granted)
         } else {
             val requestCode = generateRequestCode(permissions.hashCode())
             rpContinuation.put(requestCode, continuation)
@@ -41,7 +33,7 @@ class RequestPermissionImpl : RequestPermission {
     }
 
     override suspend fun Fragment.requestPermissionAwait(vararg permissions: String)
-            : Boolean = suspendCoroutine { continuation ->
+            : RequestPermission.Result = suspendCoroutine { continuation ->
         val context = this@requestPermissionAwait.requireContext()
 
         val notGranted = permissions.filter {
@@ -49,7 +41,7 @@ class RequestPermissionImpl : RequestPermission {
         }
 
         if (notGranted.isEmpty()) {
-            continuation.resume(true)
+            continuation.resume(RequestPermission.Result.Granted)
         } else {
             val requestCode = generateRequestCode(permissions.hashCode())
             rpContinuation.put(requestCode, continuation)

@@ -1,63 +1,74 @@
 package cchcc.android.arrp.sample
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.provider.ContactsContract
+import android.provider.OpenableColumns
+import android.telephony.TelephonyManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import cchcc.android.arrp.ActivityResult
 import cchcc.android.arrp.RequestPermission
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+
 class MainActivity : AppCompatActivity()
-    , ActivityResult by ActivityResult.create()
-    , RequestPermission by RequestPermission.create() {
+        , ActivityResult by ActivityResult.create()
+        , RequestPermission by RequestPermission.create() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-        CoroutineScope(Dispatchers.Main).launch {
-            val isGranted = requestPermissionAwait(android.Manifest.permission.READ_CONTACTS)
-            if (!isGranted)
-                return@launch
+        // sample for requestPermissionAwait
+        bt_phone_number.setOnClickListener {
+            CoroutineScope(Dispatchers.Main).launch {
+                val permissionResult = requestPermissionAwait(android.Manifest.permission.READ_PHONE_STATE)
+                if (!permissionResult.isGranted)
+                    return@launch
 
-            val intent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
-            val (resultCode, data) = startActivityForResultAwait(intent)
+                val telephonyManager = (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager)
+                @SuppressLint("MissingPermission", "HardwareIds")
+                val phoneNumber = telephonyManager.line1Number
 
-            if (resultCode == Activity.RESULT_OK) {
+                AlertDialog.Builder(this@MainActivity)
+                        .setMessage(phoneNumber)
+                        .setPositiveButton("OK") { _, _ -> }
+                        .show()
+            }
+        }
 
-                val message = contentResolver.query(
-                    data!!.data!!
-                    , null
-                    , null
-                    , null
-                    , null
+        // sample for startActivityForResultAwait
+        bt_file_name.setOnClickListener {
+            CoroutineScope(Dispatchers.Main).launch {
+                val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                    type = "*/*"
+                }
+                val (resultCode, data) = startActivityForResultAwait(intent)
+                if (resultCode != Activity.RESULT_OK)
+                    return@launch
+
+                val fileName = contentResolver.query(
+                        data!!.data!!
+                        , null
+                        , null
+                        , null
+                        , null
                 ).use { cursor ->
-                    if (cursor != null) {
-                        cursor.moveToFirst()
-
-                        try {
-                            val nameIdx = cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME)
-                            val name = cursor.getString(nameIdx)
-                            val phoneIdx = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.DATA)
-                            val phone = cursor.getString(phoneIdx)
-                            "name: $name\nphone: $phone"
-                        } catch (e: Exception) {
-                            e.toString()
-                        }
-
-                    } else {
-                        "??"
-                    }
+                    cursor!!.moveToFirst()
+                    val nameIdx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    cursor.getString(nameIdx)
                 }
 
                 AlertDialog.Builder(this@MainActivity)
-                    .setMessage(message)
-                    .setPositiveButton("OK") { _, _ -> }
-                    .show()
+                        .setMessage(fileName)
+                        .setPositiveButton("OK") { _, _ -> }
+                        .show()
             }
         }
     }
@@ -69,6 +80,6 @@ class MainActivity : AppCompatActivity()
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        permissionResult(requestCode, grantResults)
+        permissionResult(requestCode, permissions, grantResults)
     }
 }

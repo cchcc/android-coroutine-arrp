@@ -8,7 +8,14 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
 interface RequestPermission {
-    val rpContinuation: SparseArray<Continuation<Boolean>>
+    val rpContinuation: SparseArray<Continuation<RequestPermission.Result>>
+
+    sealed class Result {
+        object Granted : Result()
+        data class Denied(val granted: List<String>, val denied: List<String>) : Result()
+
+        val isGranted: Boolean get() = this is Granted
+    }
 
     /**
      *  It must be called in `onRequestPermissionsResult(...)`
@@ -16,21 +23,18 @@ interface RequestPermission {
      *  ```
      *  override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
      *      super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-     *      permissionResult(requestCode, grantResults)
+     *      permissionResult(requestCode, permissions, grantResults)
      *  }
      *  ```
      */
-    fun permissionResult(requestCode: Int, grantResults: IntArray): Unit =
+    fun permissionResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray): Unit =
         rpContinuation[requestCode]?.let { continuation ->
             rpContinuation.remove(requestCode)
-            continuation.resume(grantResults.all { it == PackageManager.PERMISSION_GRANTED })
+            var idx = 0
+            val (granted, denied) = permissions.partition { grantResults[idx++] == PackageManager.PERMISSION_GRANTED }
+            val result = if (denied.isEmpty()) Result.Granted else Result.Denied(granted, denied)
+            continuation.resume(result)
         } ?: Unit
-
-    /**
-     *  @param permissions array of [android.Manifest.permission]
-     *  @return whether permission is granted
-     */
-    fun Activity.hasPermission(vararg permissions: String): Boolean
 
     /**
      *  Convenient version of [Activity.requestPermissions] on coroutine.
@@ -40,15 +44,9 @@ interface RequestPermission {
      *  If return is not working, check if [RequestPermission.permissionResult] is placed appropriate.
      *
      *  @param permissions array of [android.Manifest.permission]
-     *  @return whether permission is granted
+     *  @return [RequestPermission.Result] whether permission is granted
      */
-    suspend fun Activity.requestPermissionAwait(vararg permissions: String): Boolean
-
-    /**
-     *  @param permissions array of [android.Manifest.permission]
-     *  @return whether permission is granted
-     */
-    fun Fragment.hasPermission(vararg permissions: String): Boolean
+    suspend fun Activity.requestPermissionAwait(vararg permissions: String): RequestPermission.Result
 
     /**
      *  Convenient version of [Fragment.requestPermissions] on coroutine.
@@ -58,9 +56,9 @@ interface RequestPermission {
      *  If return is not working, check if [RequestPermission.permissionResult] is placed appropriate.
      *
      *  @param permissions array of [android.Manifest.permission]
-     *  @return whether permission is granted
+     *  @return [RequestPermission.Result] whether permission is granted
      */
-    suspend fun Fragment.requestPermissionAwait(vararg permissions: String): Boolean
+    suspend fun Fragment.requestPermissionAwait(vararg permissions: String): RequestPermission.Result
 
     companion object {
         /**
