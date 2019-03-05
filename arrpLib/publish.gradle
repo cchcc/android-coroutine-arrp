@@ -1,0 +1,67 @@
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+version arrpLib_version
+
+publishing {
+    publications {
+        Production(MavenPublication) {
+            artifact("$buildDir/outputs/aar/arrpLib-release.aar")
+            groupId 'cchcc.android'
+            artifactId 'arrp'
+            version this.version
+
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+
+                // Iterate over the implementation dependencies (we don't want the test ones), adding a <dependency> node for each
+                configurations.implementation.allDependencies.each {
+                    // Ensure dependencies such as fileTree are not included in the pom.
+                    if (it.name != 'unspecified') {
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', it.group)
+                        dependencyNode.appendNode('artifactId', it.name)
+                        dependencyNode.appendNode('version', it.version)
+                    }
+                }
+            }
+        }
+    }
+}
+
+bintray {
+    user = rootProject.property('bintrayUser')
+    key = rootProject.property('bintrayApiKey')
+    publications = ['Production']
+    configurations = ['archives']
+    override = true
+    pkg {
+        repo = 'maven'
+        name = 'android-coroutine-arrp'
+        licenses = ['MIT']
+        websiteUrl = gitUrl
+        issueTrackerUrl = "${gitUrl}/issues"
+        vcsUrl = "${gitUrl}.git"
+        labels = ['android', 'coroutine', 'kotlin']
+        publish = true
+        publicDownloadNumbers = true
+//        dryRun = true
+        version {
+            name = this.version
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+task findConventions << {
+    println project.getConvention()
+}
