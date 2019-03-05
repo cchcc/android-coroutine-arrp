@@ -29,7 +29,7 @@ interface ActivityResult {
 
     /**
      *  Convenient version of [Activity.startActivityForResult] on coroutine.
-     *  Await till finishing process of `startActivityForResult`, and then returns (resultCode, data).
+     *  Await till finish to process of `startActivityForResult`, and then returns (resultCode, data).
      *
      *  If return is not working, check if [ActivityResult.activityResult] is placed appropriate.
      *
@@ -40,7 +40,7 @@ interface ActivityResult {
     suspend fun Activity.startActivityForResultAwait(intent: Intent, options: Bundle? = null): Pair<Int, Intent?>
 
     /**
-     *  Await till finishing process of `startActivityForResult`, and then return (resultCode, data).
+     *  Await till finish to process of `startActivityForResult`, and then return (resultCode, data).
      *
      *  If return is not working, check if [ActivityResult.activityResult] is placed appropriate.
      *
@@ -52,7 +52,7 @@ interface ActivityResult {
     /**
      *  Convenient version of [Fragment.startActivityForResult] on coroutine.
      *
-     *  If return is not working, check if [ActivityResult.activityResult] is placed appropriate.
+     *  If return is not working, check if [ActivityResult.activityResult] is right in place.
      *
      *  @param intent [Intent]
      *  @param options [Bundle]
@@ -61,9 +61,9 @@ interface ActivityResult {
     suspend fun Fragment.startActivityForResultAwait(intent: Intent, options: Bundle? = null): Pair<Int, Intent?>
 
     /**
-     *  Await till finishing process of `startActivityForResult`, and then return (resultCode, data).
+     *  Await till finish to process of `startActivityForResult`, and then return (resultCode, data).
      *
-     *  If return is not working, check if [ActivityResult.activityResult] is placed appropriate.
+     *  If return is not working, check if [ActivityResult.activityResult] is right in place.
      *
      *  @param startActivity block that should call [Fragment.startActivityForResult] with `requestCode` from parameter.
      *  @return [Pair] of (resultCode, data)
@@ -75,7 +75,7 @@ interface ActivityResult {
          *  Create instance for delegate object.
          *
          *  ```
-         *  class MyActivity : AppCompatActivity(), ActivityResult by ActivityResult.create()
+         *  class BaseActivity : AppCompatActivity(), ActivityResult by ActivityResult.create()
          *  ```
          */
         fun create(): ActivityResult = ActivityResultImpl()

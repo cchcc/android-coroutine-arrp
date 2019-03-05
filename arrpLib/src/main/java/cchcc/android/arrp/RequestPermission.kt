@@ -39,9 +39,9 @@ interface RequestPermission {
     /**
      *  Convenient version of [Activity.requestPermissions] on coroutine.
      *  Await till finish to process of `requestPermission`, and then return whether it is granted.
-     *  This method checks if permission is all granted at first. If not, request permission to user by system popup.
+     *  This method checks if permission is all granted at first. If not, it request permission to user by system popup.
      *
-     *  If return is not working, check if [RequestPermission.permissionResult] is placed appropriate.
+     *  If return is not working, check if [RequestPermission.permissionResult] is right in place.
      *
      *  @param permissions array of [android.Manifest.permission]
      *  @return [RequestPermission.Result] whether permission is granted
@@ -51,9 +51,9 @@ interface RequestPermission {
     /**
      *  Convenient version of [Fragment.requestPermissions] on coroutine.
      *  Await till finish to process of `requestPermission`, and then return whether it is granted.
-     *  This method checks if permission is all granted at first. If not, request permission to user by system popup.
+     *  This method checks if permission is all granted at first. If not, it request permission to user by system popup.
      *
-     *  If return is not working, check if [RequestPermission.permissionResult] is placed appropriate.
+     *  If return is not working, check if [RequestPermission.permissionResult] is right place.
      *
      *  @param permissions array of [android.Manifest.permission]
      *  @return [RequestPermission.Result] whether permission is granted
@@ -65,7 +65,7 @@ interface RequestPermission {
          *  Create instance for delegate object.
          *
          *  ```
-         *  class MyActivity : AppCompatActivity(), RequestPermission by RequestPermission.create()
+         *  class BaseActivity : AppCompatActivity(), RequestPermission by RequestPermission.create()
          *  ```
          */
         fun create(): RequestPermission = RequestPermissionImpl()
