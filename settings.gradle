@@ -1,1 +1,1 @@
-include ':sampleApp', ':arrpLib'
+include ':sampleApp', ':arrp'
