@@ -3,6 +3,7 @@ apply plugin: 'com.jfrog.bintray'
 
 def groupName = 'cchcc.android'
 def artifactName = 'arrp'
+def bintrayName = 'android-coroutine-arrp'
 
 version arrp_version
 group groupName
@@ -38,7 +39,7 @@ bintray {
     override = true
     pkg {
         repo = 'maven'
-        name = artifactName
+        name = bintrayName
         licenses = ['MIT']
         websiteUrl = gitUrl
         issueTrackerUrl = "${gitUrl}/issues"
